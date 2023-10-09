@@ -33,7 +33,7 @@ resource "azurerm_network_security_group" "main" {
   resource_group_name = azurerm_resource_group.Azuredevops.name
 
   security_rule {
-    name                       = "SSH"
+    name                       = "Internet"
     priority                   = 1001
     direction                  = "Inbound"
     access                     = "Allow"
@@ -41,6 +41,54 @@ resource "azurerm_network_security_group" "main" {
     source_port_range          = "*"
     destination_port_range     = "22"
     source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "AllowSubnetConnection"
+    priority                   = 103
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    destination_address_prefix = "*"
+    source_address_prefix      = "*"
+  }
+
+  security_rule {
+    name                       = "DenyInternetAccess"
+    priority                   = 101
+    direction                  = "Inbound"
+    access                     = "Deny"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "Internet"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "AllowOutAccess"
+    priority                   = 104
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    destination_address_prefix = "*"
+    source_address_prefix      = "*"
+  }
+
+  security_rule {
+    name                       = "AllowTcpAccess"
+    priority                   = 104
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "80"
+    destination_port_range     = "*"
+    source_address_prefix      = "AzureLoadBalancer"
     destination_address_prefix = "*"
   }
 }
@@ -107,8 +155,8 @@ resource "azurerm_availability_set" "main" {
   resource_group_name = azurerm_resource_group.Azuredevops.name
 }
 
-resource "azurerm_image" "main" {
-  name                = "${var.prefix}-packer"
+data "azurerm_image" "main" {
+  name                = "projectPackerImage"
   resource_group_name = azurerm_resource_group.Azuredevops.name
   location            = azurerm_resource_group.Azuredevops.location
 }

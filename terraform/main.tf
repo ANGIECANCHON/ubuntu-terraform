@@ -158,7 +158,6 @@ resource "azurerm_availability_set" "main" {
 data "azurerm_image" "main" {
   name                = "projectPackerImage"
   resource_group_name = azurerm_resource_group.Azuredevops.name
-  location            = azurerm_resource_group.Azuredevops.location
 }
 
 resource "azurerm_linux_virtual_machine" "main" {

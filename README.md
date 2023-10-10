@@ -91,6 +91,12 @@ For this project, you will write a Packer template and a Terraform template to d
 ```bash
     terraform apply main.plan
 ```
+    looks like
+![terraform apply 01 ](./img/terraform_apply_01.png)
+![terraform apply 01 ](./img/terraform_apply_02.png)
+
+more information in terraform apply outputs
+
 ### 6. Destroy flag with
 
 ```bash

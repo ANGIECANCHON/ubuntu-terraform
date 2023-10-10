@@ -144,7 +144,7 @@ resource "azurerm_lb_backend_address_pool" "main" {
 
 resource "azurerm_network_interface_backend_address_pool_association" "main" {
   count                   = var.vm_number
-  network_interface_id    = element(azurerm_network_interface.main[*].id, count.index)
+  network_interface_id    = azurerm_network_interface.main[count.index].id
   ip_configuration_name   = azurerm_network_interface.main[count.index].ip_configuration[0].name
   backend_address_pool_id = azurerm_lb_backend_address_pool.main.id
 }
@@ -169,30 +169,13 @@ resource "azurerm_linux_virtual_machine" "main" {
   admin_username                  = var.username
   admin_password                  = var.password
   disable_password_authentication = false
-  network_interface_ids = [
-    element(azurerm_network_interface.main[*].id, count.index)
-  ]
-
-  source_image_reference {
-    publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "18.04-LTS"
-    version   = "latest"
-  }
+  network_interface_ids           = [azurerm_network_interface.main[count.index].id]
+  availability_set_id             = azurerm_availability_set.main.id
+  source_image_id                 = data.azurerm_image.main.id
 
   os_disk {
     storage_account_type = "Standard_LRS"
     caching              = "ReadWrite"
-  }
-
-  computer_name = "hostname"
-  admin_ssh_key {
-    username   = var.username
-    public_key = jsondecode(azapi_resource_action.ssh_public_key_gen.output).publicKey
-  }
-
-  boot_diagnostics {
-    storage_account_uri = azurerm_storage_account.main.primary_blob_endpoint
   }
 
   tags = {
